@@ -5,7 +5,7 @@ Run with: python -m scripts.seed_data
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import async_engine, AsyncSessionLocal
+from app.config.database import async_engine, AsyncSessionLocal
 from app.models import Category, Exercise, TestCase, Example, DifficultyLevel
 
 
@@ -332,7 +332,7 @@ A palindrome is a word, phrase, or sequence that reads the same backward as forw
     for ex in examples_4:
         db.add(ex)
 
-    print("✓ Created 4 exercises with test cases and examples")
+    print("OK - Created 4 exercises with test cases and examples")
 
 
 async def seed_database():
@@ -344,7 +344,7 @@ async def seed_database():
             # Create categories
             print("Creating categories...")
             categories = await create_categories(db)
-            print(f"✓ Created {len(categories)} categories")
+            print(f"OK - Created {len(categories)} categories")
 
             # Create exercises
             print("Creating exercises...")
@@ -352,11 +352,11 @@ async def seed_database():
 
             # Commit all changes
             await db.commit()
-            print("\n✅ Database seeded successfully!")
+            print("\nSUCCESS - Database seeded successfully!")
 
         except Exception as e:
             await db.rollback()
-            print(f"\n❌ Error seeding database: {e}")
+            print(f"\nERROR - Error seeding database: {e}")
             raise
 
 

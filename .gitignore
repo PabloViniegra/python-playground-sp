@@ -44,13 +44,15 @@ ENV/
 .coverage
 htmlcov/
 
-# Alembic
-alembic/versions/*.pyc
+# Alembic - archivos compilados ya están cubiertos por la sección Python
+# NO ignorar: alembic.ini, alembic/env.py, alembic/script.py.mako, alembic/versions/*.py
+# Los archivos *.pyc y __pycache__/ ya están ignorados globalmente arriba
 
 # OS
 .DS_Store
 Thumbs.db
 
 # Claude
-CLAUDE.md
+# CLAUDE.md should be tracked as it contains project instructions
 .claude/*
+.mcp.json

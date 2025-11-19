@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 import time
 
-from app.core.database import get_db
+from app.config.database import get_db
 from app.models import Exercise
 from app.schemas import CodeExecutionRequest, CodeExecutionResponse, TestResult
 from app.services.executor import code_executor

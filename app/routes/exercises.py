@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from typing import List, Optional
 
-from app.core.database import get_db
+from app.config.database import get_db
 from app.models import Exercise, Category, TestCase, Example, DifficultyLevel
 from app.schemas import (
     ExerciseCreate,

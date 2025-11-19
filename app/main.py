@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
-from app.api import categories, exercises, execution
+from app.config.config import settings
+from app.routes import categories, exercises, execution
 
 # Create FastAPI app
 app = FastAPI(
