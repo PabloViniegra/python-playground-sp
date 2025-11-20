@@ -56,3 +56,4 @@ Thumbs.db
 # CLAUDE.md should be tracked as it contains project instructions
 .claude/*
 .mcp.json
+nul

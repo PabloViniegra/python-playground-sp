@@ -1,142 +1,139 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+"""Category routes.
+
+This module contains all API endpoints for category management.
+Business logic has been extracted to the CategoryService.
+"""
+
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
-from typing import List
 
 from app.config.database import get_db
-from app.models import Category, Exercise
-from app.schemas import CategoryCreate, CategoryUpdate, CategoryResponse, CategoryWithExerciseCount
+from app.schemas import CategoryCreate, CategoryResponse, CategoryUpdate, CategoryWithExerciseCount
+from app.services import category_service
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 
 
-@router.get("/", response_model=List[CategoryWithExerciseCount])
+@router.get("/", response_model=list[CategoryWithExerciseCount])
 async def get_categories(
-    skip: int = 0,
-    limit: int = 100,
-    db: AsyncSession = Depends(get_db)
-):
-    """Get all categories with exercise count."""
-    # Query categories with exercise count
-    query = (
-        select(
-            Category,
-            func.count(Exercise.id).label('exercise_count')
-        )
-        .outerjoin(Category.exercises)
-        .group_by(Category.id)
-        .offset(skip)
-        .limit(limit)
-    )
+    skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
+) -> list[CategoryWithExerciseCount]:
+    """Get all categories with exercise count.
 
-    result = await db.execute(query)
-    categories_with_count = result.all()
+    Args:
+        skip: Number of records to skip (pagination)
+        limit: Maximum number of records to return
+        db: Database session
 
-    return [
-        CategoryWithExerciseCount(
-            id=cat.id,
-            name=cat.name,
-            description=cat.description,
-            created_at=cat.created_at,
-            exercise_count=count
-        )
-        for cat, count in categories_with_count
-    ]
+    Returns:
+        List of categories with their exercise counts
+    """
+    categories = await category_service.get_categories_with_exercise_count(db=db)
+
+    # Apply pagination manually since the query already aggregates
+    return categories[skip : skip + limit]  # type: ignore[return-value]
 
 
 @router.get("/{category_id}", response_model=CategoryResponse)
-async def get_category(
-    category_id: int,
-    db: AsyncSession = Depends(get_db)
-):
-    """Get a specific category by ID."""
-    result = await db.execute(
-        select(Category).where(Category.id == category_id)
-    )
-    category = result.scalar_one_or_none()
+async def get_category(category_id: int, db: AsyncSession = Depends(get_db)) -> CategoryResponse:
+    """Get a specific category by ID.
 
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category not found"
-        )
+    Args:
+        category_id: Category ID
+        db: Database session
 
+    Returns:
+        Category object
+
+    Raises:
+        HTTPException: 404 if category not found
+    """
+    category = await category_service.get_category_by_id(db=db, category_id=category_id)
     return category
 
 
 @router.post("/", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
 async def create_category(
-    category_data: CategoryCreate,
-    db: AsyncSession = Depends(get_db)
-):
-    """Create a new category (Admin only - add auth later)."""
-    # Check if category with same name exists
-    result = await db.execute(
-        select(Category).where(Category.name == category_data.name)
-    )
-    existing = result.scalar_one_or_none()
+    category_data: CategoryCreate, db: AsyncSession = Depends(get_db)
+) -> CategoryResponse:
+    """Create a new category.
 
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Category with this name already exists"
-        )
+    Args:
+        category_data: Category creation data
+        db: Database session
 
-    category = Category(**category_data.model_dump())
-    db.add(category)
-    await db.commit()
-    await db.refresh(category)
+    Returns:
+        Created category
 
+    Raises:
+        HTTPException: 400 if category name already exists
+
+    Note:
+        TODO: Add authentication - Admin only
+    """
+    category = await category_service.create_category(db=db, category_data=category_data)
     return category
 
 
 @router.put("/{category_id}", response_model=CategoryResponse)
 async def update_category(
-    category_id: int,
-    category_data: CategoryUpdate,
-    db: AsyncSession = Depends(get_db)
-):
-    """Update a category (Admin only - add auth later)."""
-    result = await db.execute(
-        select(Category).where(Category.id == category_id)
+    category_id: int, category_data: CategoryUpdate, db: AsyncSession = Depends(get_db)
+) -> CategoryResponse:
+    """Update a category.
+
+    Args:
+        category_id: Category ID to update
+        category_data: Updated category data
+        db: Database session
+
+    Returns:
+        Updated category
+
+    Raises:
+        HTTPException: 404 if category not found
+        HTTPException: 400 if new name already exists
+
+    Note:
+        TODO: Add authentication - Admin only
+    """
+    category = await category_service.update_category(
+        db=db, category_id=category_id, category_data=category_data
     )
-    category = result.scalar_one_or_none()
-
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category not found"
-        )
-
-    # Update fields
-    update_data = category_data.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(category, field, value)
-
-    await db.commit()
-    await db.refresh(category)
-
     return category
 
 
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_category(
-    category_id: int,
-    db: AsyncSession = Depends(get_db)
-):
-    """Delete a category (Admin only - add auth later)."""
-    result = await db.execute(
-        select(Category).where(Category.id == category_id)
-    )
-    category = result.scalar_one_or_none()
+async def delete_category(category_id: int, db: AsyncSession = Depends(get_db)) -> None:
+    """Delete a category.
 
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category not found"
-        )
+    This only removes the category, not the associated exercises (many-to-many).
 
-    await db.delete(category)
-    await db.commit()
+    Args:
+        category_id: Category ID to delete
+        db: Database session
 
-    return None
+    Raises:
+        HTTPException: 404 if category not found
+
+    Note:
+        TODO: Add authentication - Admin only
+    """
+    await category_service.delete_category(db=db, category_id=category_id)
+
+
+@router.get("/{category_id}/stats", response_model=dict)
+async def get_category_statistics(category_id: int, db: AsyncSession = Depends(get_db)) -> dict:
+    """Get statistics for a category.
+
+    Args:
+        category_id: Category ID
+        db: Database session
+
+    Returns:
+        Dictionary with category statistics
+
+    Raises:
+        HTTPException: 404 if category not found
+    """
+    stats = await category_service.get_category_statistics(db=db, category_id=category_id)
+    return stats

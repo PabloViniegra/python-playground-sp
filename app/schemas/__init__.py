@@ -1,32 +1,28 @@
 from app.schemas.category import (
     CategoryBase,
     CategoryCreate,
-    CategoryUpdate,
     CategoryResponse,
+    CategoryUpdate,
     CategoryWithExerciseCount,
 )
-from app.schemas.test_case import (
-    TestCaseBase,
-    TestCaseCreate,
-    TestCaseUpdate,
-    TestCaseResponse,
-    ExampleBase,
-    ExampleCreate,
-    ExampleUpdate,
-    ExampleResponse,
-)
+from app.schemas.execution import CodeExecutionRequest, CodeExecutionResponse, TestResult
 from app.schemas.exercise import (
     ExerciseBase,
     ExerciseCreate,
-    ExerciseUpdate,
-    ExerciseListItem,
     ExerciseDetail,
+    ExerciseListItem,
     ExerciseResponse,
+    ExerciseUpdate,
 )
-from app.schemas.execution import (
-    CodeExecutionRequest,
-    TestResult,
-    CodeExecutionResponse,
+from app.schemas.test_case import (
+    ExampleBase,
+    ExampleCreate,
+    ExampleResponse,
+    ExampleUpdate,
+    TestCaseBase,
+    TestCaseCreate,
+    TestCaseResponse,
+    TestCaseUpdate,
 )
 
 __all__ = [

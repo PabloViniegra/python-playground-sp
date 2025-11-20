@@ -1,5 +1,6 @@
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict
-from typing import Any, Optional
 
 
 class TestCaseBase(BaseModel):
@@ -15,11 +16,11 @@ class TestCaseCreate(TestCaseBase):
 
 
 class TestCaseUpdate(BaseModel):
-    input_data: Optional[dict[str, Any]] = None
-    expected_output: Optional[Any] = None
-    description: Optional[str] = None
-    is_public: Optional[bool] = None
-    order: Optional[int] = None
+    input_data: dict[str, Any] | None = None
+    expected_output: Any | None = None
+    description: str | None = None
+    is_public: bool | None = None
+    order: int | None = None
 
 
 class TestCaseResponse(TestCaseBase):
@@ -32,7 +33,7 @@ class TestCaseResponse(TestCaseBase):
 class ExampleBase(BaseModel):
     input: str
     output: str
-    explanation: Optional[str] = None
+    explanation: str | None = None
     order: int = 0
 
 
@@ -41,10 +42,10 @@ class ExampleCreate(ExampleBase):
 
 
 class ExampleUpdate(BaseModel):
-    input: Optional[str] = None
-    output: Optional[str] = None
-    explanation: Optional[str] = None
-    order: Optional[int] = None
+    input: str | None = None
+    output: str | None = None
+    explanation: str | None = None
+    order: int | None = None
 
 
 class ExampleResponse(ExampleBase):

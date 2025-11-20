@@ -1,0 +1,57 @@
+# Development dependencies
+# Install with: pip install -r requirements.txt -r requirements-dev.txt
+
+# ============================================================================
+# Code Formatting & Linting
+# ============================================================================
+black==23.12.1                  # Code formatter
+ruff==0.1.9                     # Fast Python linter
+isort==5.13.2                   # Import sorting
+
+# ============================================================================
+# Type Checking
+# ============================================================================
+mypy==1.8.0                     # Static type checker
+types-python-jose==3.3.4        # Type stubs for python-jose
+
+# ============================================================================
+# Testing & Coverage
+# ============================================================================
+pytest==7.4.3                   # Testing framework (already in main requirements)
+pytest-asyncio==0.21.1          # Async test support (already in main requirements)
+pytest-cov==4.1.0               # Coverage plugin
+pytest-xdist==3.5.0             # Parallel test execution
+pytest-mock==3.12.0             # Mocking support
+pytest-timeout==2.2.0           # Test timeouts
+httpx==0.25.2                   # HTTP client for testing (already in main requirements)
+faker==21.0.0                   # Test data generation
+freezegun==1.4.0                # Time mocking
+
+# ============================================================================
+# Security
+# ============================================================================
+bandit==1.7.6                   # Security linter
+safety==2.3.5                   # Dependency vulnerability scanner
+
+# ============================================================================
+# Pre-commit & Git Hooks
+# ============================================================================
+pre-commit==3.6.0               # Git hook framework
+
+# ============================================================================
+# Performance Testing (Optional)
+# ============================================================================
+locust==2.20.0                  # Load testing
+pytest-benchmark==4.0.0         # Benchmarking
+
+# ============================================================================
+# Documentation (Optional)
+# ============================================================================
+mkdocs==1.5.3                   # Documentation generator
+mkdocs-material==9.5.3          # Material theme for mkdocs
+
+# ============================================================================
+# Utilities
+# ============================================================================
+ipython==8.19.0                 # Enhanced Python shell
+ipdb==0.13.13                   # IPython debugger

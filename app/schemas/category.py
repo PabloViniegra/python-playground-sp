@@ -1,23 +1,28 @@
-from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
+
 
 class CategoryBase(BaseModel):
-	name: str
-	description: Optional[str] = None
+    name: str
+    description: str | None = None
+
 
 class CategoryCreate(CategoryBase):
-	pass
+    pass
+
 
 class CategoryUpdate(BaseModel):
-	name: Optional[str] = None
-	description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None
+
 
 class CategoryResponse(CategoryBase):
-	id: int
-	created_at: datetime
+    id: int
+    created_at: datetime
 
-	model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
+
 
 class CategoryWithExerciseCount(CategoryResponse):
-	exercise_count: int = 0
+    exercise_count: int = 0

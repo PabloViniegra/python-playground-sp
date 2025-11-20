@@ -1,10 +1,10 @@
-from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import Optional, List
+
+from pydantic import BaseModel, ConfigDict
 
 from app.models.exercise import DifficultyLevel
 from app.schemas.category import CategoryResponse
-from app.schemas.test_case import TestCaseResponse, ExampleResponse
+from app.schemas.test_case import ExampleResponse, TestCaseResponse
 
 
 class ExerciseBase(BaseModel):
@@ -15,24 +15,24 @@ class ExerciseBase(BaseModel):
 
 
 class ExerciseCreate(ExerciseBase):
-    category_ids: List[int] = []
-    test_cases: List[dict] = []
-    examples: List[dict] = []
+    category_ids: list[int] = []
+    test_cases: list[dict] = []
+    examples: list[dict] = []
 
 
 class ExerciseUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    difficulty: Optional[DifficultyLevel] = None
-    function_name: Optional[str] = None
-    category_ids: Optional[List[int]] = None
+    title: str | None = None
+    description: str | None = None
+    difficulty: DifficultyLevel | None = None
+    function_name: str | None = None
+    category_ids: list[int] | None = None
 
 
 class ExerciseListItem(BaseModel):
     id: int
     title: str
     difficulty: DifficultyLevel
-    categories: List[CategoryResponse] = []
+    categories: list[CategoryResponse] = []
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -40,9 +40,9 @@ class ExerciseListItem(BaseModel):
 
 class ExerciseDetail(ExerciseBase):
     id: int
-    categories: List[CategoryResponse] = []
-    test_cases: List[TestCaseResponse] = []
-    examples: List[ExampleResponse] = []
+    categories: list[CategoryResponse] = []
+    test_cases: list[TestCaseResponse] = []
+    examples: list[ExampleResponse] = []
     created_at: datetime
     updated_at: datetime
 

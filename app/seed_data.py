@@ -3,13 +3,14 @@ Seed script to populate the database with initial data.
 Run with: python -m scripts.seed_data
 """
 import asyncio
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config.database import async_engine, AsyncSessionLocal
-from app.models import Category, Exercise, TestCase, Example, DifficultyLevel
+from app.config.database import AsyncSessionLocal
+from app.models import Category, DifficultyLevel, Example, Exercise, TestCase
 
 
-async def create_categories(db: AsyncSession):
+async def create_categories(db: AsyncSession) -> list[Category]:
     """Create initial categories."""
     categories_data = [
         {"name": "Strings", "description": "String manipulation and processing"},
@@ -32,7 +33,7 @@ async def create_categories(db: AsyncSession):
     return categories
 
 
-async def create_exercises(db: AsyncSession, categories: list):
+async def create_exercises(db: AsyncSession, categories: list[Category]) -> None:
     """Create sample exercises."""
 
     # Exercise 1: Sum Two Numbers (Beginner)
@@ -50,7 +51,7 @@ Write a function that takes two numbers as parameters and returns their sum.
 - Both inputs will be valid numbers
 """,
         difficulty=DifficultyLevel.BEGINNER,
-        function_name="sum_two_numbers"
+        function_name="sum_two_numbers",
     )
     exercise1.categories = [categories[2]]  # Mathematics
     db.add(exercise1)
@@ -63,21 +64,21 @@ Write a function that takes two numbers as parameters and returns their sum.
             input_data={"a": 2, "b": 3},
             expected_output=5,
             description="Basic positive numbers",
-            order=0
+            order=0,
         ),
         TestCase(
             exercise_id=exercise1.id,
             input_data={"a": -1, "b": 1},
             expected_output=0,
             description="Positive and negative",
-            order=1
+            order=1,
         ),
         TestCase(
             exercise_id=exercise1.id,
             input_data={"a": 0, "b": 0},
             expected_output=0,
             description="Both zeros",
-            order=2
+            order=2,
         ),
     ]
     for tc in test_cases_1:
@@ -90,14 +91,14 @@ Write a function that takes two numbers as parameters and returns their sum.
             input="sum_two_numbers(5, 7)",
             output="12",
             explanation="5 + 7 = 12",
-            order=0
+            order=0,
         ),
         Example(
             exercise_id=exercise1.id,
             input="sum_two_numbers(-3, 8)",
             output="5",
             explanation="-3 + 8 = 5",
-            order=1
+            order=1,
         ),
     ]
     for ex in examples_1:
@@ -122,7 +123,7 @@ If the input is "hello", the output should be "olleh"
 - String may be empty
 """,
         difficulty=DifficultyLevel.BEGINNER,
-        function_name="reverse_string"
+        function_name="reverse_string",
     )
     exercise2.categories = [categories[0]]  # Strings
     db.add(exercise2)
@@ -135,28 +136,28 @@ If the input is "hello", the output should be "olleh"
             input_data={"text": "hello"},
             expected_output="olleh",
             description="Simple word",
-            order=0
+            order=0,
         ),
         TestCase(
             exercise_id=exercise2.id,
             input_data={"text": "Python"},
             expected_output="nohtyP",
             description="Capitalized word",
-            order=1
+            order=1,
         ),
         TestCase(
             exercise_id=exercise2.id,
             input_data={"text": ""},
             expected_output="",
             description="Empty string",
-            order=2
+            order=2,
         ),
         TestCase(
             exercise_id=exercise2.id,
             input_data={"text": "a"},
             expected_output="a",
             description="Single character",
-            order=3
+            order=3,
         ),
     ]
     for tc in test_cases_2:
@@ -169,7 +170,7 @@ If the input is "hello", the output should be "olleh"
             input='reverse_string("world")',
             output='"dlrow"',
             explanation="The string is reversed character by character",
-            order=0
+            order=0,
         ),
     ]
     for ex in examples_2:
@@ -195,7 +196,7 @@ Write a function that takes a list of numbers and returns the maximum value.
 Try to solve this without using any built-in functions!
 """,
         difficulty=DifficultyLevel.INTERMEDIATE,
-        function_name="find_maximum"
+        function_name="find_maximum",
     )
     exercise3.categories = [categories[1], categories[3]]  # Lists, Algorithms
     db.add(exercise3)
@@ -208,28 +209,28 @@ Try to solve this without using any built-in functions!
             input_data={"numbers": [1, 5, 3, 9, 2]},
             expected_output=9,
             description="Unsorted list",
-            order=0
+            order=0,
         ),
         TestCase(
             exercise_id=exercise3.id,
             input_data={"numbers": [-5, -1, -10, -3]},
             expected_output=-1,
             description="All negative numbers",
-            order=1
+            order=1,
         ),
         TestCase(
             exercise_id=exercise3.id,
             input_data={"numbers": [42]},
             expected_output=42,
             description="Single element",
-            order=2
+            order=2,
         ),
         TestCase(
             exercise_id=exercise3.id,
             input_data={"numbers": [1, 2, 3, 4, 5]},
             expected_output=5,
             description="Sorted ascending",
-            order=3
+            order=3,
         ),
     ]
     for tc in test_cases_3:
@@ -242,7 +243,7 @@ Try to solve this without using any built-in functions!
             input="find_maximum([3, 7, 2, 8, 1])",
             output="8",
             explanation="8 is the largest number in the list",
-            order=0
+            order=0,
         ),
     ]
     for ex in examples_3:
@@ -272,7 +273,7 @@ A palindrome is a word, phrase, or sequence that reads the same backward as forw
 - Input will be a valid string
 """,
         difficulty=DifficultyLevel.INTERMEDIATE,
-        function_name="is_palindrome"
+        function_name="is_palindrome",
     )
     exercise4.categories = [categories[0], categories[3]]  # Strings, Algorithms
     db.add(exercise4)
@@ -285,28 +286,28 @@ A palindrome is a word, phrase, or sequence that reads the same backward as forw
             input_data={"text": "racecar"},
             expected_output=True,
             description="Simple palindrome",
-            order=0
+            order=0,
         ),
         TestCase(
             exercise_id=exercise4.id,
             input_data={"text": "hello"},
             expected_output=False,
             description="Not a palindrome",
-            order=1
+            order=1,
         ),
         TestCase(
             exercise_id=exercise4.id,
             input_data={"text": "A man a plan a canal Panama"},
             expected_output=True,
             description="Palindrome with spaces and mixed case",
-            order=2
+            order=2,
         ),
         TestCase(
             exercise_id=exercise4.id,
             input_data={"text": ""},
             expected_output=True,
             description="Empty string is palindrome",
-            order=3
+            order=3,
         ),
     ]
     for tc in test_cases_4:
@@ -319,14 +320,14 @@ A palindrome is a word, phrase, or sequence that reads the same backward as forw
             input='is_palindrome("madam")',
             output="True",
             explanation="Reads the same forwards and backwards",
-            order=0
+            order=0,
         ),
         Example(
             exercise_id=exercise4.id,
             input='is_palindrome("python")',
             output="False",
             explanation="Does not read the same backwards",
-            order=1
+            order=1,
         ),
     ]
     for ex in examples_4:
@@ -335,7 +336,7 @@ A palindrome is a word, phrase, or sequence that reads the same backward as forw
     print("OK - Created 4 exercises with test cases and examples")
 
 
-async def seed_database():
+async def seed_database() -> None:
     """Main seed function."""
     print("Starting database seed...")
 

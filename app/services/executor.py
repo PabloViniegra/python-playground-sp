@@ -1,10 +1,10 @@
-import subprocess
 import json
-import time
+import subprocess
 import tempfile
-import os
-from typing import Any, Dict, List, Tuple
+import time
+from contextlib import suppress
 from pathlib import Path
+from typing import Any, ClassVar
 
 from app.config.config import settings
 
@@ -13,7 +13,7 @@ class CodeExecutor:
     """Service for executing Python code in a sandboxed environment."""
 
     # Blacklisted imports and statements for security
-    BLACKLIST = [
+    BLACKLIST: ClassVar[list[str]] = [
         "import os",
         "import sys",
         "import subprocess",
@@ -36,10 +36,10 @@ class CodeExecutor:
         "raw_input(",
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.timeout = settings.code_execution_timeout
 
-    def _contains_blacklisted_code(self, code: str) -> Tuple[bool, str]:
+    def _contains_blacklisted_code(self, code: str) -> tuple[bool, str]:
         """Check if code contains blacklisted imports or statements."""
         code_lower = code.lower()
         for blacklisted in self.BLACKLIST:
@@ -48,10 +48,7 @@ class CodeExecutor:
         return False, ""
 
     def _create_test_wrapper(
-        self,
-        user_code: str,
-        function_name: str,
-        test_cases: List[Dict[str, Any]]
+        self, user_code: str, function_name: str, test_cases: list[dict[str, Any]]
     ) -> str:
         """
         Create a wrapper script that:
@@ -101,11 +98,8 @@ print(json.dumps(results))
         return wrapper
 
     def execute(
-        self,
-        user_code: str,
-        function_name: str,
-        test_cases: List[Dict[str, Any]]
-    ) -> Tuple[bool, List[Dict[str, Any]], str]:
+        self, user_code: str, function_name: str, test_cases: list[dict[str, Any]]
+    ) -> tuple[bool, list[dict[str, Any]], str]:
         """
         Execute user code against test cases.
 
@@ -125,11 +119,7 @@ print(json.dumps(results))
         wrapper_script = self._create_test_wrapper(user_code, function_name, test_cases)
 
         # Create temporary file
-        with tempfile.NamedTemporaryFile(
-            mode='w',
-            suffix='.py',
-            delete=False
-        ) as tmp_file:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp_file:
             tmp_file.write(wrapper_script)
             tmp_file_path = tmp_file.name
 
@@ -138,10 +128,11 @@ print(json.dumps(results))
             start_time = time.time()
 
             result = subprocess.run(
-                ['python3', tmp_file_path],
+                ["python3", tmp_file_path],
                 capture_output=True,
                 text=True,
                 timeout=self.timeout,
+                check=False,
                 # Limit memory (Linux only)
                 # preexec_fn=lambda: resource.setrlimit(
                 #     resource.RLIMIT_AS,
@@ -149,7 +140,7 @@ print(json.dumps(results))
                 # )
             )
 
-            execution_time = time.time() - start_time
+            time.time() - start_time
 
             # Check for execution errors
             if result.returncode != 0:
@@ -169,14 +160,12 @@ print(json.dumps(results))
             return False, [], f"Execution timed out (limit: {self.timeout}s)"
 
         except Exception as e:
-            return False, [], f"Execution error: {str(e)}"
+            return False, [], f"Execution error: {e!s}"
 
         finally:
             # Clean up temporary file
-            try:
-                os.unlink(tmp_file_path)
-            except:
-                pass
+            with suppress(OSError):
+                Path(tmp_file_path).unlink()
 
 
 # Singleton instance
