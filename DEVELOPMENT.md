@@ -34,6 +34,7 @@ pre-commit install
 ```
 
 This will install hooks that run:
+
 - Black (code formatter)
 - Ruff (linter)
 - isort (import sorter)
@@ -65,8 +66,9 @@ black app/ --diff
 ```
 
 **Configuration:**
+
 - Line length: 100 characters
-- Target: Python 3.11
+- Target: Python 3.12
 
 ### Ruff - Fast Python Linter
 
@@ -84,6 +86,7 @@ ruff check app/services/exercise_service.py
 ```
 
 **What Ruff checks:**
+
 - Code style (PEP 8)
 - Import sorting
 - Unused imports/variables
@@ -107,6 +110,7 @@ isort app/ --diff
 ```
 
 **Import order:**
+
 1. Standard library imports
 2. Third-party imports
 3. Local application imports
@@ -127,6 +131,7 @@ mypy app/ --html-report ./mypy-report
 ```
 
 **Configuration:**
+
 - Strict mode enabled
 - Ignores missing imports for some third-party libraries
 
@@ -213,6 +218,7 @@ open htmlcov/index.html
 ```
 
 **Coverage Requirements:**
+
 - Minimum overall coverage: 80%
 - Critical components (executor, services): 90%+
 
@@ -359,6 +365,7 @@ test: add security tests for executor
 ```
 
 **Prefixes:**
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `refactor:` - Code refactoring
