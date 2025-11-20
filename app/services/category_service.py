@@ -256,10 +256,11 @@ class CategoryService:
                 Category.id,
                 Category.name,
                 Category.description,
+                Category.created_at,
                 func.count(Exercise.id).label("exercise_count"),
             )
             .outerjoin(Category.exercises)
-            .group_by(Category.id, Category.name, Category.description)
+            .group_by(Category.id, Category.name, Category.description, Category.created_at)
             .order_by(Category.name)
         )
 
@@ -271,6 +272,7 @@ class CategoryService:
                 "id": row.id,
                 "name": row.name,
                 "description": row.description,
+                "created_at": row.created_at,
                 "exercise_count": row.exercise_count,
             }
             for row in rows
